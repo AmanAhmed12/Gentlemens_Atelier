@@ -76,22 +76,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const updateQuantity = useCallback(
     async (productId: string, quantity: number) => {
-      await apiFetch(`/api/cart/${productId}`, {
+      const res = await apiFetch(`/api/cart/${productId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quantity }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        show(data.error ?? "Could not update quantity", "error");
+      }
       await refresh();
     },
-    [refresh],
+    [refresh, show],
   );
 
   const removeItem = useCallback(
     async (productId: string) => {
-      await apiFetch(`/api/cart/${productId}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/cart/${productId}`, { method: "DELETE" });
+      if (!res.ok) {
+        show("Could not remove item from cart", "error");
+      } else {
+        show("Removed from cart", "success");
+      }
       await refresh();
     },
-    [refresh],
+    [refresh, show],
   );
 
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);

@@ -85,7 +85,7 @@ export default function AdminCategoriesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-3xl text-foreground">Categories</h1>
         <Button onClick={openCreate}>
           <Plus className="h-4 w-4" /> New Category

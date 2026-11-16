@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 
 export function Table({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className="glass overflow-x-auto rounded-2xl">
-      <table className={cn("w-full text-left text-sm", className)}>{children}</table>
+    <div className={cn("glass overflow-x-auto rounded-2xl", className)}>
+      <table className="w-full text-left text-sm">{children}</table>
     </div>
   );
 }

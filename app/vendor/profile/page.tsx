@@ -57,7 +57,7 @@ export default function VendorProfilePage() {
 
   return (
     <div className="max-w-2xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-3xl text-foreground">Store Profile</h1>
         <Badge status={profile.status}>{profile.status}</Badge>
       </div>

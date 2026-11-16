@@ -58,10 +58,16 @@ export function signRefreshToken(payload: AuthPayload) {
   return jwt.sign(payload, refreshSecret(), { expiresIn: refreshTtl() as jwt.SignOptions["expiresIn"] });
 }
 
+function toCleanPayload(decoded: jwt.JwtPayload | string): AuthPayload {
+  if (typeof decoded === "string") throw new Error("Unexpected token payload");
+  const { sub, role, name, email } = decoded as jwt.JwtPayload & AuthPayload;
+  return { sub, role, name, email };
+}
+
 export function verifyAccessToken(token: string | undefined): AuthPayload | null {
   if (!token) return null;
   try {
-    return jwt.verify(token, accessSecret()) as AuthPayload;
+    return toCleanPayload(jwt.verify(token, accessSecret()));
   } catch {
     return null;
   }
@@ -70,7 +76,7 @@ export function verifyAccessToken(token: string | undefined): AuthPayload | null
 export function verifyRefreshToken(token: string | undefined): AuthPayload | null {
   if (!token) return null;
   try {
-    return jwt.verify(token, refreshSecret()) as AuthPayload;
+    return toCleanPayload(jwt.verify(token, refreshSecret()));
   } catch {
     return null;
   }

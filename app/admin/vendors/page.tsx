@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
+import { mutate } from "@/lib/toastFetch";
 import { Check, X, Ban } from "lucide-react";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@/components/ui/Table";
 import { Badge } from "@/components/ui/Badge";
@@ -41,13 +42,18 @@ export default function AdminVendorsPage() {
   }, [tab]);
 
   async function updateStatus(id: string, status: Vendor["status"]) {
-    await apiFetch(`/api/vendors/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    show(`Vendor ${status.toLowerCase()}`, "success");
-    load();
+    const { ok } = await mutate(
+      `/api/vendors/${id}/status`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      },
+      show,
+      `Vendor ${status.toLowerCase()}`,
+      "Could not update vendor status",
+    );
+    if (ok) load();
   }
 
   return (

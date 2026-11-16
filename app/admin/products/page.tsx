@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
+import { mutate } from "@/lib/toastFetch";
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, Pencil, Trash2 } from "lucide-react";
@@ -39,25 +40,29 @@ export default function AdminProductsPage() {
   }, []);
 
   async function toggleActive(product: AdminProduct) {
-    await apiFetch(`/api/products/${product.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isActive: !product.isActive }),
-    });
-    show(product.isActive ? "Product deactivated" : "Product activated", "success");
-    load();
+    const { ok } = await mutate(
+      `/api/products/${product.id}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !product.isActive }),
+      },
+      show,
+      product.isActive ? "Product deactivated" : "Product activated",
+      "Could not update product status",
+    );
+    if (ok) load();
   }
 
   async function handleDelete(product: AdminProduct) {
     if (!window.confirm(`Remove "${product.title}" from the platform?`)) return;
-    await apiFetch(`/api/products/${product.id}`, { method: "DELETE" });
-    show("Product removed", "success");
-    load();
+    const { ok } = await mutate(`/api/products/${product.id}`, { method: "DELETE" }, show, "Product removed", "Could not remove product");
+    if (ok) load();
   }
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-3xl text-foreground">All Products</h1>
         <Link href="/admin/products/new">
           <Button>

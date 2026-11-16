@@ -71,11 +71,16 @@ export default function CheckoutPage() {
       }
 
       window.payhere.onCompleted = async (completedOrderId: string) => {
-        await apiFetch("/api/payments/payhere/confirm", {
+        const confirmRes = await apiFetch("/api/payments/payhere/confirm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId: completedOrderId }),
         });
+        const confirmData = await confirmRes.json().catch(() => ({}));
+        if (!confirmRes.ok) {
+          show(confirmData.error ?? "Payment succeeded but could not be confirmed", "error");
+          return;
+        }
         await refresh();
         show("Payment approved — thank you!", "success");
         router.push(`/orders/${completedOrderId}`);

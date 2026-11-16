@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
+import { mutate } from "@/lib/toastFetch";
 import { Plus, Pencil, Trash2, ShieldOff, ShieldCheck } from "lucide-react";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@/components/ui/Table";
 import { Badge } from "@/components/ui/Badge";
@@ -56,21 +57,27 @@ export default function AdminUsersPage() {
   }, []);
 
   async function toggleSuspend(user: AdminUser) {
-    await apiFetch(`/api/admin/users/${user.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isSuspended: !user.isSuspended }),
-    });
-    show(user.isSuspended ? "User reinstated" : "User suspended", "success");
-    load();
+    const { ok } = await mutate(
+      `/api/admin/users/${user.id}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isSuspended: !user.isSuspended }),
+      },
+      show,
+      user.isSuspended ? "User reinstated" : "User suspended",
+      "Could not update user status",
+    );
+    if (ok) load();
   }
 
   async function confirmDelete() {
     if (!toDelete) return;
-    await apiFetch(`/api/admin/users/${toDelete.id}`, { method: "DELETE" });
-    show("User deleted", "success");
-    setToDelete(null);
-    load();
+    const { ok } = await mutate(`/api/admin/users/${toDelete.id}`, { method: "DELETE" }, show, "User deleted", "Could not delete user");
+    if (ok) {
+      setToDelete(null);
+      load();
+    }
   }
 
   async function handleCreate(e: React.FormEvent) {
@@ -129,7 +136,7 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-3xl text-foreground">Manage Users</h1>
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="h-4 w-4" /> New User

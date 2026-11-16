@@ -44,7 +44,10 @@ export function ImageUploader({
         }
         uploaded.push(data.url);
       }
-      onChange([...value, ...uploaded]);
+      if (uploaded.length > 0) {
+        show(uploaded.length > 1 ? `${uploaded.length} images uploaded` : "Image uploaded", "success");
+        onChange([...value, ...uploaded]);
+      }
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";

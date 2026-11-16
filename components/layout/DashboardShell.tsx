@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { LogOut, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export interface NavItem {
   href: string;
@@ -23,6 +24,12 @@ export function DashboardShell({
 }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { show } = useToast();
+
+  async function handleLogout() {
+    await logout();
+    show("Logged out successfully", "success");
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -55,7 +62,7 @@ export function DashboardShell({
           <Link href="/" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground/70 hover:bg-white/5">
             <ArrowLeft className="h-4 w-4" /> Back to Site
           </Link>
-          <button onClick={logout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-burgundy hover:bg-white/5">
+          <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-burgundy hover:bg-white/5">
             <LogOut className="h-4 w-4" /> Logout
           </button>
         </div>
@@ -64,7 +71,7 @@ export function DashboardShell({
       <div className="flex-1">
         <header className="flex items-center justify-between border-b border-white/10 bg-background/60 px-6 py-4 backdrop-blur-xl lg:hidden">
           <span className="font-display text-lg text-gradient-gold">{title}</span>
-          <button onClick={logout} className="text-sm text-burgundy">
+          <button onClick={handleLogout} className="text-sm text-burgundy">
             Logout
           </button>
         </header>

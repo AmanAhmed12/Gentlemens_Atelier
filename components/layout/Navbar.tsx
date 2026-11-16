@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { ShoppingBag, Menu, X, User, LayoutDashboard, LogOut } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useCart } from "@/components/providers/CartProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import { Button } from "@/components/ui/Button";
 
 const navLinks = [
@@ -17,7 +18,13 @@ const navLinks = [
 export function Navbar() {
   const { user, logout } = useAuth();
   const { itemCount, openCart } = useCart();
+  const { show } = useToast();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  async function handleLogout() {
+    await logout();
+    show("Logged out successfully", "success");
+  }
 
   const dashboardHref = user?.role === "ADMIN" ? "/admin" : user?.role === "VENDOR" ? "/vendor" : null;
 
@@ -70,7 +77,7 @@ export function Navbar() {
                   </Button>
                 </Link>
               )}
-              <Button variant="ghost" size="sm" onClick={logout}>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
@@ -121,7 +128,7 @@ export function Navbar() {
                   My Account
                 </Link>
               )}
-              <button onClick={logout} className="text-left text-sm text-burgundy">
+              <button onClick={handleLogout} className="text-left text-sm text-burgundy">
                 Logout
               </button>
             </>

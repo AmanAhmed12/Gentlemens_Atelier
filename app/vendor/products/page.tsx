@@ -8,6 +8,7 @@ import { Table, Thead, Tbody, Tr, Th, Td } from "@/components/ui/Table";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/providers/ToastProvider";
+import { apiFetch } from "@/lib/apiFetch";
 import { formatPrice } from "@/lib/utils";
 
 interface VendorProduct {
@@ -26,7 +27,7 @@ export default function VendorProductsPage() {
   const { show } = useToast();
 
   async function load() {
-    const res = await fetch("/api/products?mine=true&pageSize=24");
+    const res = await apiFetch("/api/products?mine=true&pageSize=24");
     const data = await res.json();
     setProducts(data.products ?? []);
     setLoading(false);
@@ -38,7 +39,7 @@ export default function VendorProductsPage() {
 
   async function handleDelete(product: VendorProduct) {
     if (!window.confirm(`Delete "${product.title}"? This cannot be undone.`)) return;
-    const res = await fetch(`/api/products/${product.id}`, { method: "DELETE" });
+    const res = await apiFetch(`/api/products/${product.id}`, { method: "DELETE" });
     if (!res.ok) {
       show("Could not delete product", "error");
       return;
@@ -49,7 +50,7 @@ export default function VendorProductsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-3xl text-foreground">My Products</h1>
         <Link href="/vendor/products/new">
           <Button>

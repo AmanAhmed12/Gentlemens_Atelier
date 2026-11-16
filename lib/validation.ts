@@ -1,12 +1,15 @@
 import { z } from "zod";
 
+const optionalString = (schema: z.ZodString) =>
+  z.preprocess((value) => (value === "" ? undefined : value), schema.optional());
+
 export const registerSchema = z.object({
   name: z.string().min(2).max(80),
   email: z.string().email(),
   password: z.string().min(8).max(100),
   role: z.enum(["CUSTOMER", "VENDOR"]),
-  storeName: z.string().min(2).max(100).optional(),
-  businessRegNo: z.string().min(2).max(50).optional(),
+  storeName: optionalString(z.string().min(2).max(100)),
+  businessRegNo: optionalString(z.string().min(2).max(50)),
 });
 
 export const loginSchema = z.object({
@@ -17,13 +20,13 @@ export const loginSchema = z.object({
 export const profileUpdateSchema = z.object({
   name: z.string().min(2).max(80).optional(),
   phone: z.string().max(20).optional(),
-  avatarUrl: z.string().url().optional(),
+  avatarUrl: optionalString(z.string().url()),
 });
 
 export const vendorProfileUpdateSchema = z.object({
-  storeName: z.string().min(2).max(100).optional(),
+  storeName: optionalString(z.string().min(2).max(100)),
   description: z.string().max(1000).optional(),
-  logoUrl: z.string().url().optional(),
+  logoUrl: optionalString(z.string().url()),
 });
 
 export const adminCreateUserSchema = z.object({
@@ -31,8 +34,8 @@ export const adminCreateUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(100),
   role: z.enum(["CUSTOMER", "VENDOR"]),
-  storeName: z.string().min(2).max(100).optional(),
-  businessRegNo: z.string().min(2).max(50).optional(),
+  storeName: optionalString(z.string().min(2).max(100)),
+  businessRegNo: optionalString(z.string().min(2).max(50)),
 });
 
 export const adminUpdateUserSchema = z.object({
@@ -49,7 +52,7 @@ export const vendorStatusSchema = z.object({
 
 export const categorySchema = z.object({
   name: z.string().min(2).max(60),
-  imageUrl: z.string().url().optional(),
+  imageUrl: optionalString(z.string().url()),
 });
 
 export const productSchema = z.object({
@@ -61,7 +64,7 @@ export const productSchema = z.object({
   images: z.array(z.string().url()).min(1).max(8),
   isActive: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
-  vendorId: z.string().min(1).optional(),
+  vendorId: optionalString(z.string().min(1)),
 });
 
 export const productUpdateSchema = productSchema.partial();
