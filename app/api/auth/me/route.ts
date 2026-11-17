@@ -5,6 +5,6 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const user = await getAuthUser();
-  if (!user) return NextResponse.json({ user: null });
+  if (!user) return NextResponse.json({ user: null }, { status: 401 });
   return NextResponse.json({ user: { id: user.sub, name: user.name, email: user.email, role: user.role } });
 }

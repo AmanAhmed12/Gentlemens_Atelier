@@ -40,10 +40,9 @@ export async function POST(req: NextRequest) {
     where: { userId_productId: { userId: user.sub, productId: product.id } },
   });
 
-  const desiredQuantity = Math.min(
-    product.stockQuantity,
-    (existing?.quantity ?? 0) + parsed.data.quantity,
-  );
+  const wantedQuantity = (existing?.quantity ?? 0) + parsed.data.quantity;
+  const desiredQuantity = Math.min(product.stockQuantity, wantedQuantity);
+  const capped = desiredQuantity < wantedQuantity;
 
   const item = await prisma.cartItem.upsert({
     where: { userId_productId: { userId: user.sub, productId: product.id } },
@@ -51,7 +50,7 @@ export async function POST(req: NextRequest) {
     create: { userId: user.sub, productId: product.id, quantity: desiredQuantity },
   });
 
-  return NextResponse.json({ item });
+  return NextResponse.json({ item, capped, available: product.stockQuantity });
 }
 
 export async function DELETE() {

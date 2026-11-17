@@ -85,8 +85,16 @@ export default function CheckoutPage() {
         show("Payment approved — thank you!", "success");
         router.push(`/orders/${completedOrderId}`);
       };
-      window.payhere.onDismissed = () => show("Payment was cancelled", "info");
-      window.payhere.onError = (error: string) => show(`Payment error: ${error}`, "error");
+      window.payhere.onDismissed = async () => {
+        await apiFetch(`/api/orders/${orderData.order.id}/cancel`, { method: "POST" });
+        await refresh();
+        show("Payment was cancelled", "info");
+      };
+      window.payhere.onError = async (error: string) => {
+        await apiFetch(`/api/orders/${orderData.order.id}/cancel`, { method: "POST" });
+        await refresh();
+        show(`Payment error: ${error}`, "error");
+      };
 
       window.payhere.startPayment({
         sandbox: payment.sandbox ? "true" : "false",

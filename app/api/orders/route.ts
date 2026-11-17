@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireRole, requireUser } from "@/lib/rbac";
 import { checkoutSchema } from "@/lib/validation";
+import { InsufficientStockError, reserveStock } from "@/lib/order-fulfillment";
 
 export const runtime = "nodejs";
 
@@ -62,33 +63,51 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Your cart is empty" }, { status: 400 });
   }
 
-  for (const item of cartItems) {
-    if (!item.product.isActive || item.product.stockQuantity < item.quantity) {
-      return NextResponse.json({ error: `${item.product.title} no longer has enough stock` }, { status: 409 });
-    }
-  }
-
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + Number(item.product.price) * item.quantity,
     0,
   );
 
-  const order = await prisma.order.create({
-    data: {
-      customerId: user.sub,
-      totalAmount,
-      ...parsed.data,
-      items: {
-        create: cartItems.map((item) => ({
+  try {
+    const order = await prisma.$transaction(async (tx) => {
+      await reserveStock(
+        tx,
+        cartItems.map((item) => ({
           productId: item.productId,
-          vendorId: item.product.vendorId,
+          productTitle: item.product.title,
           quantity: item.quantity,
-          priceAtPurchase: item.product.price,
         })),
-      },
-    },
-    include: { items: true },
-  });
+      );
 
-  return NextResponse.json({ order }, { status: 201 });
+      const created = await tx.order.create({
+        data: {
+          customerId: user.sub,
+          totalAmount,
+          ...parsed.data,
+          items: {
+            create: cartItems.map((item) => ({
+              productId: item.productId,
+              vendorId: item.product.vendorId,
+              quantity: item.quantity,
+              priceAtPurchase: item.product.price,
+            })),
+          },
+        },
+        include: { items: true },
+      });
+
+      await tx.cartItem.deleteMany({
+        where: { userId: user.sub, productId: { in: cartItems.map((item) => item.productId) } },
+      });
+
+      return created;
+    });
+
+    return NextResponse.json({ order }, { status: 201 });
+  } catch (error) {
+    if (error instanceof InsufficientStockError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+    throw error;
+  }
 }

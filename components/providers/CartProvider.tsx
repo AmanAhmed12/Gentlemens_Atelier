@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/components/providers/ToastProvider";
 import { apiFetch } from "@/lib/apiFetch";
 
@@ -39,6 +40,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const { show } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const refresh = useCallback(async () => {
     const res = await apiFetch("/api/cart");
@@ -60,6 +63,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
       if (res.status === 401) {
         show("Please log in to add items to your cart", "error");
+        router.push(`/login?next=${encodeURIComponent(pathname)}`);
         return;
       }
       if (!res.ok) {
@@ -67,11 +71,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         show(data.error ?? "Could not add item to cart", "error");
         return;
       }
+      const data = await res.json();
       await refresh();
-      show("Added to cart", "success");
+      if (data.capped) {
+        show(`Only ${data.available} in stock — added the max available to your cart`, "info");
+      } else {
+        show("Added to cart", "success");
+      }
       setIsOpen(true);
     },
-    [refresh, show],
+    [refresh, show, router, pathname],
   );
 
   const updateQuantity = useCallback(
@@ -84,6 +93,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         show(data.error ?? "Could not update quantity", "error");
+        await refresh();
+        return;
+      }
+      const data = await res.json();
+      if (data.capped) {
+        show(`Only ${data.available} in stock`, "info");
       }
       await refresh();
     },

@@ -20,13 +20,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pr
   if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
   const quantity = Math.min(parsed.data.quantity, product.stockQuantity);
+  const capped = quantity < parsed.data.quantity;
 
   const item = await prisma.cartItem.update({
     where: { userId_productId: { userId: user.sub, productId } },
     data: { quantity },
   });
 
-  return NextResponse.json({ item });
+  return NextResponse.json({ item, capped, available: product.stockQuantity });
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ productId: string }> }) {

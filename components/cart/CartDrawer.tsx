@@ -6,10 +6,12 @@ import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { Drawer } from "@/components/ui/Drawer";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/components/providers/CartProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import { formatPrice } from "@/lib/utils";
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, updateQuantity, removeItem, subtotal } = useCart();
+  const { show } = useToast();
 
   return (
     <Drawer open={isOpen} onClose={closeCart} title="Your Cart">
@@ -44,7 +46,13 @@ export function CartDrawer() {
                       </button>
                       <span className="w-6 text-center text-sm">{item.quantity}</span>
                       <button
-                        onClick={() => updateQuantity(item.productId, Math.min(item.product.stockQuantity, item.quantity + 1))}
+                        onClick={() => {
+                          if (item.quantity >= item.product.stockQuantity) {
+                            show(`Only ${item.product.stockQuantity} of ${item.product.title} in stock`, "info");
+                            return;
+                          }
+                          updateQuantity(item.productId, item.quantity + 1);
+                        }}
                         className="rounded-full border border-white/10 p-1 hover:border-gold/50"
                       >
                         <Plus className="h-3 w-3" />

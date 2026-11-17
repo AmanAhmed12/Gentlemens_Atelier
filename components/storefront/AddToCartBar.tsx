@@ -4,9 +4,11 @@ import { useState } from "react";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/components/providers/CartProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export function AddToCartBar({ productId, stockQuantity }: { productId: string; stockQuantity: number }) {
   const { addItem } = useCart();
+  const { show } = useToast();
   const [quantity, setQuantity] = useState(1);
   const outOfStock = stockQuantity <= 0;
 
@@ -22,7 +24,13 @@ export function AddToCartBar({ productId, stockQuantity }: { productId: string; 
         </button>
         <span className="w-6 text-center text-sm">{quantity}</span>
         <button
-          onClick={() => setQuantity((q) => Math.min(stockQuantity, q + 1))}
+          onClick={() => {
+            if (quantity >= stockQuantity) {
+              show(`Only ${stockQuantity} left in stock`, "info");
+              return;
+            }
+            setQuantity((q) => q + 1);
+          }}
           className="rounded-full p-1 hover:bg-white/10"
           disabled={outOfStock}
         >
