@@ -46,7 +46,7 @@ export default function RegisterPage() {
       }
       await refresh();
       show(
-        role === "VENDOR" ? "Vendor account created — awaiting admin approval" : "Account created successfully",
+        role === "VENDOR" ? "Vendor account created   awaiting admin approval" : "Account created successfully",
         "success",
       );
       router.push(role === "VENDOR" ? "/vendor" : "/");

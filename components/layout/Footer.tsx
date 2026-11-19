@@ -9,7 +9,7 @@ export function Footer() {
           <div>
             <h3 className="font-display text-lg text-gradient-gold">The Gentlemen&apos;s Atelier</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              A curated multi-vendor marketplace for tailored menswear — bringing independent textile
+              A curated multi-vendor marketplace for tailored menswear   bringing independent textile
               houses and discerning customers together on one secure platform.
             </p>
           </div>
@@ -38,7 +38,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-muted">
-          &copy; {new Date().getFullYear()} The Gentlemen&apos;s Atelier. Academic project demo — no real transactions are processed.
+          &copy; {new Date().getFullYear()} The Gentlemen&apos;s Atelier. Academic project demo   no real transactions are processed.
         </div>
       </div>
     </footer>

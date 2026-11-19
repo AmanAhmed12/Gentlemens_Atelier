@@ -110,7 +110,7 @@ export default function AdminCategoriesPage() {
                     <Image src={category.imageUrl} alt="" fill className="object-cover" />
                   </div>
                 ) : (
-                  <span className="text-muted">—</span>
+                  <span className="text-muted"> </span>
                 )}
               </Td>
               <Td>{category.name}</Td>

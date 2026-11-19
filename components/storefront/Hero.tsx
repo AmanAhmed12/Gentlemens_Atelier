@@ -31,7 +31,7 @@ export function Hero() {
           transition={{ delay: 0.2 }}
           className="mx-auto mt-6 max-w-xl text-sm text-muted sm:text-base"
         >
-          Shop curated suits, shirts, and accessories from independent textile houses — with secure
+          Shop curated suits, shirts, and accessories from independent textile houses   with secure
           checkout, real-time order tracking, and an AI stylist on hand whenever you need it.
         </motion.p>
         <motion.div

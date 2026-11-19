@@ -15,7 +15,7 @@ const highlights = [
   {
     icon: Sparkles,
     title: "AI Shopping Assistant",
-    description: "Ask our Gemini-powered assistant about sizing, availability, or your order status — any time.",
+    description: "Ask our Gemini-powered assistant about sizing, availability, or your order status   any time.",
   },
 ];
 

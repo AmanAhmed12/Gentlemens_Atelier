@@ -74,7 +74,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       await refresh();
       if (data.capped) {
-        show(`Only ${data.available} in stock — added the max available to your cart`, "info");
+        show(`Only ${data.available} in stock   added the max available to your cart`, "info");
       } else {
         show("Added to cart", "success");
       }

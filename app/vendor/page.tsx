@@ -46,7 +46,7 @@ export default async function VendorOverviewPage() {
         <GlassCard className="mb-6 flex items-center gap-3 border-amber-500/30">
           <AlertTriangle className="h-5 w-5 text-amber-400" />
           <p className="text-sm text-foreground/90">
-            Your store status is <Badge status={vendor.status}>{vendor.status}</Badge> — product listings are hidden
+            Your store status is <Badge status={vendor.status}>{vendor.status}</Badge>   product listings are hidden
             from customers until an administrator approves your account.
           </p>
         </GlassCard>

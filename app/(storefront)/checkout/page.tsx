@@ -82,7 +82,7 @@ export default function CheckoutPage() {
           return;
         }
         await refresh();
-        show("Payment approved — thank you!", "success");
+        show("Payment approved   thank you!", "success");
         router.push(`/orders/${completedOrderId}`);
       };
       window.payhere.onDismissed = async () => {
@@ -126,7 +126,7 @@ export default function CheckoutPage() {
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="font-display text-3xl text-foreground">Checkout</h1>
         <p className="mt-2 text-sm text-muted">
-          Payments are processed through the PayHere sandbox — no real charge will occur.
+          Payments are processed through the PayHere sandbox   no real charge will occur.
         </p>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
